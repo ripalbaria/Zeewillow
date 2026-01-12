@@ -15,7 +15,7 @@ jobs:
       - name: Build M3U File
         run: |
           # 1. Fetch the base Zee5 M3U file
-          curl -s https://raw.githubusercontent.com/himanshu-temp/m3u/main/zee5.m3u -o zee5.m3u
+          curl -s https://geefive.saqlainhaider8198.workers.dev/ -o zee5.m3u
           
           # 2. Fetch the Willow Sports source
           curl -s https://raw.githubusercontent.com/Love4vn/love4vn/refs/heads/main/S_check.m3u -o willow_source.m3u
