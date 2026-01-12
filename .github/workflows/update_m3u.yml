@@ -1,0 +1,43 @@
+name: Update Zee5 with Willow
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update-list:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build M3U File
+        run: |
+          # 1. Fetch the base Zee5 M3U file
+          curl -s https://raw.githubusercontent.com/himanshu-temp/m3u/main/zee5.m3u -o zee5.m3u
+          
+          # 2. Fetch the Willow Sports source
+          curl -s https://raw.githubusercontent.com/Love4vn/love4vn/refs/heads/main/S_check.m3u -o willow_source.m3u
+          
+          # 3. Extract Willow block (Name + 4 lines after for props and URL)
+          # We include the line before (-B 1) for the #EXTINF metadata
+          grep -B 1 -A 4 "Willow Sports (SD)" willow_source.m3u > willow_extract.txt
+          
+          # 4. Combine them
+          # We take the Zee5 file and add the Willow extract at the bottom
+          cat zee5.m3u > final.m3u
+          echo "" >> final.m3u # Add a space for safety
+          cat willow_extract.txt >> final.m3u
+          
+          # 5. Rename to your desired file name
+          mv final.m3u zee5_updated.m3u
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add zee5_updated.m3u
+          git commit -m "Update Zee5 M3U with fresh Willow Sports" || exit 0
+          git push
+
